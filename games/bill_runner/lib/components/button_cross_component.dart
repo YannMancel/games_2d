@@ -3,25 +3,33 @@ import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
+import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 
 enum ButtonCrossDirection { idle, top, bottom, left, right }
 
-class ButtonCrossComponent extends Component with HasGameReference {
+class ButtonCrossComponent extends RectangleComponent with HasGameReference {
   ButtonCrossComponent({
     super.key,
-    double squareSizeButton = 100.0,
-  }) : _squareSizeButton = squareSizeButton;
+    double ratio = 2.5,
+    double squareSizeButton = 80.0,
+  })  : assert(ratio > 2.0, 'The buttons overlap each other.'),
+        _squareSizeButton = squareSizeButton,
+        super(
+          size: Vector2.all(ratio * squareSizeButton),
+          anchor: Anchor.bottomRight,
+          paint: BasicPalette.transparent.paint(),
+        );
 
   final double _squareSizeButton;
 
-  late ButtonCrossDirection _direction;
+  ButtonCrossDirection _direction = ButtonCrossDirection.idle;
   ButtonCrossDirection get direction => _direction;
   void resetDirection() => _direction = ButtonCrossDirection.idle;
 
   @override
   FutureOr<void> onLoad() async {
-    resetDirection();
+    position = game.size;
 
     final image = await game.images.load('joystick_sheet.png');
     final sheet = SpriteSheet.fromColumnsAndRows(
@@ -34,34 +42,27 @@ class ButtonCrossComponent extends Component with HasGameReference {
     final sizeButton = Vector2.all(_squareSizeButton);
     final buttonConfigurations = <({
       Vector2 position,
+      Anchor anchor,
       VoidCallback onPressed,
     })>[
       (
-        position: Vector2(
-          game.size.x - (3.0 / 2.0) * _squareSizeButton - 16.0,
-          game.size.y - (5.0 / 2.0) * _squareSizeButton - 16.0,
-        ),
+        position: Vector2(size.x / 2.0, 0),
+        anchor: Anchor.topCenter,
         onPressed: () => _direction = ButtonCrossDirection.top,
       ),
       (
-        position: Vector2(
-          game.size.x - (3.0 / 2.0) * _squareSizeButton - 16.0,
-          game.size.y - _squareSizeButton / 2.0 - 16.0,
-        ),
+        position: Vector2(size.x / 2.0, size.y),
+        anchor: Anchor.bottomCenter,
         onPressed: () => _direction = ButtonCrossDirection.bottom,
       ),
       (
-        position: Vector2(
-          game.size.x - (5.0 / 2.0) * _squareSizeButton - 16.0,
-          game.size.y - (3.0 / 2.0) * _squareSizeButton - 16.0,
-        ),
+        position: Vector2(0.0, size.y / 2.0),
+        anchor: Anchor.centerLeft,
         onPressed: () => _direction = ButtonCrossDirection.left,
       ),
       (
-        position: Vector2(
-          game.size.x - _squareSizeButton / 2.0 - 16.0,
-          game.size.y - (3.0 / 2.0) * _squareSizeButton - 16.0,
-        ),
+        position: Vector2(size.x, size.y / 2.0),
+        anchor: Anchor.centerRight,
         onPressed: () => _direction = ButtonCrossDirection.right,
       ),
     ];
@@ -72,7 +73,7 @@ class ButtonCrossComponent extends Component with HasGameReference {
         buttonDown: activeButton,
         position: configuration.position,
         size: sizeButton,
-        anchor: Anchor.center,
+        anchor: configuration.anchor,
         onPressed: configuration.onPressed,
       );
       add(component);
