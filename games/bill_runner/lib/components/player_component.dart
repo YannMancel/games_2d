@@ -4,9 +4,9 @@ import 'package:bill_runner/components/_components.dart';
 import 'package:flame/components.dart';
 
 class PlayerComponent extends SpriteComponent with HasGameReference {
-  PlayerComponent({
+  PlayerComponent(
+    ButtonCrossComponent buttonCross, {
     super.key,
-    required ButtonCrossComponent buttonCross,
     double squareSize = 50.0,
     double step = 50.0,
   })  : _buttonCross = buttonCross,
