@@ -8,7 +8,14 @@ import 'package:flame/sprite.dart';
 
 enum ButtonCrossDirection { idle, top, bottom, left, right }
 
-class ButtonCrossComponent extends RectangleComponent with HasGameReference {
+abstract interface class ButtonCrossInterface {
+  ButtonCrossDirection get direction;
+  void resetDirection();
+}
+
+class ButtonCrossComponent extends RectangleComponent
+    with HasGameReference
+    implements ButtonCrossInterface {
   ButtonCrossComponent({
     super.key,
     double ratio = 2.5,
@@ -22,16 +29,23 @@ class ButtonCrossComponent extends RectangleComponent with HasGameReference {
         );
 
   final double _squareSizeButton;
-
   ButtonCrossDirection _direction = ButtonCrossDirection.idle;
+
+  @override
   ButtonCrossDirection get direction => _direction;
-  void resetDirection() => _direction = ButtonCrossDirection.idle;
+
+  @override
+  void resetDirection() {
+    if (_direction != ButtonCrossDirection.idle) {
+      _direction = ButtonCrossDirection.idle;
+    }
+  }
 
   @override
   FutureOr<void> onLoad() async {
     position = game.size;
 
-    final image = await game.images.load('joystick_sheet.png');
+    final image = await game.images.load('joystick_sprite_sheet.png');
     final sheet = SpriteSheet.fromColumnsAndRows(
       image: image,
       columns: 6,

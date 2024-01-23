@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:bill_runner/components/_components.dart';
 import 'package:flame/components.dart';
+import 'package:flame/sprite.dart';
 
 class PlayerComponent extends SpriteComponent with HasGameReference {
   PlayerComponent(
-    ButtonCrossComponent buttonCross, {
+    ButtonCrossInterface buttonCross, {
     super.key,
     double squareSize = 50.0,
     double step = 50.0,
@@ -15,26 +16,43 @@ class PlayerComponent extends SpriteComponent with HasGameReference {
           size: Vector2.all(squareSize),
         );
 
-  final ButtonCrossComponent _buttonCross;
+  final ButtonCrossInterface _buttonCross;
   final double _step;
+  late SpriteSheet _sheet;
 
   @override
   FutureOr<void> onLoad() async {
-    sprite = await game.loadSprite('player.png');
+    final image = await game.images.load('player_sprite_sheet.png');
+    _sheet = SpriteSheet.fromColumnsAndRows(
+      image: image,
+      columns: 4,
+      rows: 4,
+    );
+    sprite = _sheet.getSprite(0, 0);
     position = game.size / 2.0;
   }
 
   @override
   void update(double dt) {
     final zeroPosition = Vector2.zero();
-    final value = switch (_buttonCross.direction) {
-      ButtonCrossDirection.idle => zeroPosition,
-      ButtonCrossDirection.top => zeroPosition..y = -_step,
-      ButtonCrossDirection.bottom => zeroPosition..y = _step,
-      ButtonCrossDirection.left => zeroPosition..x = -_step,
-      ButtonCrossDirection.right => zeroPosition..x = _step,
-    };
-    position.add(value);
+    switch (_buttonCross.direction) {
+      case ButtonCrossDirection.idle:
+        /* Do nothing here */
+        break;
+      case ButtonCrossDirection.top:
+        position.add(zeroPosition..y = -_step);
+        sprite = _sheet.getSprite(2, 0);
+      case ButtonCrossDirection.bottom:
+        position.add(zeroPosition..y = _step);
+        sprite = _sheet.getSprite(0, 0);
+      case ButtonCrossDirection.left:
+        position.add(zeroPosition..x = -_step);
+        sprite = _sheet.getSprite(1, 0);
+      case ButtonCrossDirection.right:
+        position.add(zeroPosition..x = _step);
+        sprite = _sheet.getSprite(3, 0);
+    }
+
     _buttonCross.resetDirection();
   }
 }
