@@ -1,24 +1,23 @@
 import 'dart:async';
 
-import 'package:bill_runner/components/_components.dart';
+import 'package:bill_runner/core/_core.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 
 class PlayerComponent extends SpriteComponent with HasGameReference {
-  PlayerComponent(
-    ButtonCrossInterface buttonCross, {
+  PlayerComponent({
     super.key,
     double squareSize = 50.0,
     double step = 50.0,
-  })  : _buttonCross = buttonCross,
-        _step = step,
+  })  : _step = step,
         super(
           size: Vector2.all(squareSize),
         );
 
-  final ButtonCrossInterface _buttonCross;
   final double _step;
   late SpriteSheet _sheet;
+  late PlayerDirection _direction;
+  set direction(PlayerDirection direction) => _direction = direction;
 
   @override
   FutureOr<void> onLoad() async {
@@ -30,29 +29,30 @@ class PlayerComponent extends SpriteComponent with HasGameReference {
     );
     sprite = _sheet.getSprite(0, 0);
     position = game.size / 2.0;
+    _direction = PlayerDirection.idle;
   }
 
   @override
   void update(double dt) {
     final zeroPosition = Vector2.zero();
-    switch (_buttonCross.direction) {
-      case ButtonCrossDirection.idle:
+    switch (_direction) {
+      case PlayerDirection.idle:
         /* Do nothing here */
         break;
-      case ButtonCrossDirection.top:
+      case PlayerDirection.top:
         position.add(zeroPosition..y = -_step);
         sprite = _sheet.getSprite(2, 0);
-      case ButtonCrossDirection.bottom:
+      case PlayerDirection.bottom:
         position.add(zeroPosition..y = _step);
         sprite = _sheet.getSprite(0, 0);
-      case ButtonCrossDirection.left:
+      case PlayerDirection.left:
         position.add(zeroPosition..x = -_step);
         sprite = _sheet.getSprite(1, 0);
-      case ButtonCrossDirection.right:
+      case PlayerDirection.right:
         position.add(zeroPosition..x = _step);
         sprite = _sheet.getSprite(3, 0);
     }
 
-    _buttonCross.resetDirection();
+    _direction = PlayerDirection.idle;
   }
 }

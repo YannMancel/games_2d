@@ -1,4 +1,4 @@
-import 'package:bill_runner/my_game.dart';
+import 'package:bill_runner/core/_core.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +8,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GameWidget(
-      game: MyGame(),
+      game: BillRunnerGame(),
     );
   }
 }

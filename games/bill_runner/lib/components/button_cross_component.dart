@@ -6,22 +6,21 @@ import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 
-enum ButtonCrossDirection { idle, top, bottom, left, right }
-
-abstract interface class ButtonCrossInterface {
-  ButtonCrossDirection get direction;
-  void resetDirection();
-}
-
-class ButtonCrossComponent extends RectangleComponent
-    with HasGameReference
-    implements ButtonCrossInterface {
+class ButtonCrossComponent extends RectangleComponent with HasGameReference {
   ButtonCrossComponent({
     super.key,
     double ratio = 2.5,
     double squareSizeButton = 80.0,
+    required VoidCallback onPressedTop,
+    required VoidCallback onPressedBottom,
+    required VoidCallback onPressedLeft,
+    required VoidCallback onPressedRight,
   })  : assert(ratio > 2.0, 'The buttons overlap each other.'),
         _squareSizeButton = squareSizeButton,
+        _onPressedTop = onPressedTop,
+        _onPressedBottom = onPressedBottom,
+        _onPressedLeft = onPressedLeft,
+        _onPressedRight = onPressedRight,
         super(
           size: Vector2.all(ratio * squareSizeButton),
           anchor: Anchor.bottomRight,
@@ -29,17 +28,10 @@ class ButtonCrossComponent extends RectangleComponent
         );
 
   final double _squareSizeButton;
-  ButtonCrossDirection _direction = ButtonCrossDirection.idle;
-
-  @override
-  ButtonCrossDirection get direction => _direction;
-
-  @override
-  void resetDirection() {
-    if (_direction != ButtonCrossDirection.idle) {
-      _direction = ButtonCrossDirection.idle;
-    }
-  }
+  final VoidCallback _onPressedTop;
+  final VoidCallback _onPressedBottom;
+  final VoidCallback _onPressedLeft;
+  final VoidCallback _onPressedRight;
 
   @override
   FutureOr<void> onLoad() async {
@@ -54,7 +46,7 @@ class ButtonCrossComponent extends RectangleComponent
     final inactiveButton = sheet.getSpriteById(4);
     final activeButton = sheet.getSpriteById(2);
     final sizeButton = Vector2.all(_squareSizeButton);
-    final buttonConfigurations = <({
+    final configurations = <({
       Vector2 position,
       Anchor anchor,
       VoidCallback onPressed,
@@ -62,26 +54,26 @@ class ButtonCrossComponent extends RectangleComponent
       (
         position: Vector2(size.x / 2.0, 0),
         anchor: Anchor.topCenter,
-        onPressed: () => _direction = ButtonCrossDirection.top,
+        onPressed: _onPressedTop,
       ),
       (
         position: Vector2(size.x / 2.0, size.y),
         anchor: Anchor.bottomCenter,
-        onPressed: () => _direction = ButtonCrossDirection.bottom,
+        onPressed: _onPressedBottom,
       ),
       (
         position: Vector2(0.0, size.y / 2.0),
         anchor: Anchor.centerLeft,
-        onPressed: () => _direction = ButtonCrossDirection.left,
+        onPressed: _onPressedLeft,
       ),
       (
         position: Vector2(size.x, size.y / 2.0),
         anchor: Anchor.centerRight,
-        onPressed: () => _direction = ButtonCrossDirection.right,
+        onPressed: _onPressedRight,
       ),
     ];
 
-    for (final configuration in buttonConfigurations) {
+    for (final configuration in configurations) {
       final component = SpriteButtonComponent(
         button: inactiveButton,
         buttonDown: activeButton,
