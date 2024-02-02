@@ -1,4 +1,4 @@
-import 'package:bill_runner/core/_core.dart';
+import 'package:bill_runner/components/_components.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 

@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:bill_runner/components/_components.dart';
 import 'package:bill_runner/core/_core.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 
 class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
-    with HasGameReference {
+    with HasGameReference<BillRunnerGame> {
   PlayerComponent({
     super.key,
+    super.position,
     double squareSize = 50.0,
     double animationSpeed = 0.15,
     double playerSpeed = 300.0,
@@ -39,7 +41,7 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
 
   @override
   FutureOr<void> onLoad() async {
-    final image = await game.images.load('player_sprite_sheet.png');
+    final image = game.images.fromCache('player_sprite_sheet.png');
     final sheet = SpriteSheet.fromColumnsAndRows(
       image: image,
       columns: 4,
@@ -91,7 +93,6 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
       PlayerDirection.right: rightAnimation,
     };
     current = PlayerDirection.idle;
-    position = game.size / 2.0;
   }
 
   @override

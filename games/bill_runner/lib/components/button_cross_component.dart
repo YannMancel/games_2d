@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:bill_runner/components/_components.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 
-class ButtonCrossComponent extends RectangleComponent with HasGameReference {
+class ButtonCrossComponent extends RectangleComponent
+    with HasGameReference<BillRunnerGame> {
   ButtonCrossComponent({
     super.key,
+    super.position,
     double ratio = 2.5,
     double squareSizeButton = 80.0,
     required VoidCallback onPressedTop,
@@ -35,9 +38,7 @@ class ButtonCrossComponent extends RectangleComponent with HasGameReference {
 
   @override
   FutureOr<void> onLoad() async {
-    position = game.size;
-
-    final image = await game.images.load('joystick_sprite_sheet.png');
+    final image = game.images.fromCache('joystick_sprite_sheet.png');
     final sheet = SpriteSheet.fromColumnsAndRows(
       image: image,
       columns: 6,
