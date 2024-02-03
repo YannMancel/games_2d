@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:bill_runner/components/_components.dart';
 import 'package:bill_runner/core/_core.dart';
 import 'package:flame/components.dart';
+import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 
 class BillRunnerGame extends FlameGame {
@@ -14,8 +17,9 @@ class BillRunnerGame extends FlameGame {
       ],
     );
 
+    final halfCanvasSize = canvasSize / 2.0;
     final background = BackgroundComponent();
-    final player = PlayerComponent(position: canvasSize / 2.0);
+    final player = PlayerComponent(position: halfCanvasSize);
     final buttonCross = ButtonCrossComponent(
       position: canvasSize,
       onPressedTop: () => player.direction = PlayerDirection.top,
@@ -24,18 +28,29 @@ class BillRunnerGame extends FlameGame {
       onPressedRight: () => player.direction = PlayerDirection.right,
     );
 
+    // We need background.size to set camera bounds
+    await world.add(background);
     world.addAll(
       <Component>[
-        background,
         player,
         buttonCross,
       ],
     );
 
-    camera = CameraComponent.withFixedResolution(
-      width: canvasSize.x,
-      height: canvasSize.y,
-      hudComponents: [buttonCross],
-    )..follow(player);
+    camera = CameraComponent(
+      world: world,
+      hudComponents: <Component>[buttonCross],
+    )
+      ..viewfinder.anchor = Anchor.center
+      ..follow(player)
+      ..setBounds(
+        Rectangle.fromPoints(
+          halfCanvasSize,
+          background.size - halfCanvasSize,
+        ),
+        considerViewport: true,
+      );
+
+    debugMode = true;
   }
 }
