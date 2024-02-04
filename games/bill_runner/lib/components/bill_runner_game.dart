@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bill_runner/components/_components.dart';
-import 'package:bill_runner/core/_core.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';

@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:bill_runner/components/_components.dart';
-import 'package:bill_runner/core/_core.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
+
+enum PlayerDirection { idle, top, bottom, left, right }
 
 class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
     with HasGameReference<BillRunnerGame> {
