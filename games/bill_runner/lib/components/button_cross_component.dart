@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:bill_runner/components/_components.dart';
 import 'package:flame/components.dart';
-import 'package:flame/input.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/sprite.dart';
 
@@ -14,12 +13,14 @@ class ButtonCrossComponent extends RectangleComponent
     super.position,
     double ratio = 2.5,
     double squareSizeButton = 80.0,
+    required VoidCallback onIdle,
     required VoidCallback onPressedTop,
     required VoidCallback onPressedBottom,
     required VoidCallback onPressedLeft,
     required VoidCallback onPressedRight,
   })  : assert(ratio > 2.0, 'The buttons overlap each other.'),
         _squareSizeButton = squareSizeButton,
+        _onIdle = onIdle,
         _onPressedTop = onPressedTop,
         _onPressedBottom = onPressedBottom,
         _onPressedLeft = onPressedLeft,
@@ -31,6 +32,7 @@ class ButtonCrossComponent extends RectangleComponent
         );
 
   final double _squareSizeButton;
+  final VoidCallback _onIdle;
   final VoidCallback _onPressedTop;
   final VoidCallback _onPressedBottom;
   final VoidCallback _onPressedLeft;
@@ -44,8 +46,8 @@ class ButtonCrossComponent extends RectangleComponent
       columns: 6,
       rows: 1,
     );
-    final inactiveButton = sheet.getSpriteById(4);
-    final activeButton = sheet.getSpriteById(2);
+    final upButtonSprite = sheet.getSpriteById(4);
+    final downButtonSprite = sheet.getSpriteById(2);
     final sizeButton = Vector2.all(_squareSizeButton);
     final configurations = <({
       Vector2 position,
@@ -75,14 +77,21 @@ class ButtonCrossComponent extends RectangleComponent
     ];
 
     for (final configuration in configurations) {
-      final component = SpriteButtonComponent(
-        button: inactiveButton,
-        buttonDown: activeButton,
+      final component = BillRunnerButton(
+        defaultButton: upButtonSprite,
+        downButton: downButtonSprite,
         position: configuration.position,
         size: sizeButton,
         anchor: configuration.anchor,
-        onPressed: configuration.onPressed,
+        onChanged: (state) {
+          final callback = switch (state) {
+            BillRunnerButtonState.up => _onIdle,
+            BillRunnerButtonState.down => configuration.onPressed,
+          };
+          callback();
+        },
       );
+
       add(component);
     }
   }

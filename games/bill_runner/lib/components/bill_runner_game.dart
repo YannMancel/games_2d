@@ -22,6 +22,7 @@ class BillRunnerGame extends FlameGame {
     final player = PlayerComponent(position: halfCanvasSize);
     final buttonCross = ButtonCrossComponent(
       position: canvasSize,
+      onIdle: () => player.direction = PlayerDirection.idle,
       onPressedTop: () => player.direction = PlayerDirection.top,
       onPressedBottom: () => player.direction = PlayerDirection.bottom,
       onPressedLeft: () => player.direction = PlayerDirection.left,
