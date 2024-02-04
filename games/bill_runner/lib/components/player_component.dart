@@ -11,16 +11,19 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   PlayerComponent({
     super.key,
     super.position,
+    required Vector2 bounds,
     double squareSize = 50.0,
     double animationSpeed = 0.15,
     double playerSpeed = 300.0,
-  })  : _animationSpeed = animationSpeed,
+  })  : _bounds = bounds,
+        _animationSpeed = animationSpeed,
         _playerSpeed = playerSpeed,
         super(
           size: Vector2.all(squareSize),
           anchor: Anchor.center,
         );
 
+  final Vector2 _bounds;
   final double _animationSpeed;
   final double _playerSpeed;
 
@@ -35,7 +38,11 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
       PlayerDirection.right => zero..x = step,
     };
 
-    position.add(offset);
+    position = (position + offset)
+      ..clamp(
+        size / 2.0,
+        _bounds - (size / 2.0),
+      );
   }
 
   set direction(PlayerDirection direction) => current = direction;

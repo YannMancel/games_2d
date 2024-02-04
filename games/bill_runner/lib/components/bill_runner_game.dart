@@ -16,9 +16,15 @@ class BillRunnerGame extends FlameGame {
       ],
     );
 
-    final halfCanvasSize = canvasSize / 2.0;
     final background = BackgroundComponent();
-    final player = PlayerComponent(position: halfCanvasSize);
+    // We need background.size to set bounds
+    await world.add(background);
+
+    final halfCanvasSize = canvasSize / 2.0;
+    final player = PlayerComponent(
+      position: halfCanvasSize,
+      bounds: background.size,
+    );
     final buttonCross = ButtonCrossComponent(
       position: canvasSize,
       onIdle: () => player.direction = PlayerDirection.idle,
@@ -28,8 +34,6 @@ class BillRunnerGame extends FlameGame {
       onPressedRight: () => player.direction = PlayerDirection.right,
     );
 
-    // We need background.size to set camera bounds
-    await world.add(background);
     world.addAll(
       <Component>[
         player,
