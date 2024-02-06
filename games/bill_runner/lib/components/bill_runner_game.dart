@@ -4,9 +4,15 @@ import 'package:bill_runner/components/_components.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
-class BillRunnerGame extends FlameGame with HasCollisionDetection {
+class BillRunnerGame extends FlameGame
+    with HasCollisionDetection, KeyboardEvents {
+  late PlayerComponent _player;
+
   @override
   Future<void> onLoad() async {
     await images.loadAll(
@@ -30,22 +36,22 @@ class BillRunnerGame extends FlameGame with HasCollisionDetection {
     }
 
     final halfCanvasSize = canvasSize / 2.0;
-    final player = PlayerComponent(
+    _player = PlayerComponent(
       position: halfCanvasSize,
       bounds: map.size,
     );
     final buttonCross = ButtonCrossComponent(
       position: canvasSize,
-      onIdle: () => player.direction = PlayerDirection.idle,
-      onPressedTop: () => player.direction = PlayerDirection.top,
-      onPressedBottom: () => player.direction = PlayerDirection.bottom,
-      onPressedLeft: () => player.direction = PlayerDirection.left,
-      onPressedRight: () => player.direction = PlayerDirection.right,
+      onIdle: () => _player.direction = PlayerDirection.idle,
+      onPressedTop: () => _player.direction = PlayerDirection.top,
+      onPressedBottom: () => _player.direction = PlayerDirection.bottom,
+      onPressedLeft: () => _player.direction = PlayerDirection.left,
+      onPressedRight: () => _player.direction = PlayerDirection.right,
     );
 
     world.addAll(
       <Component>[
-        player,
+        _player,
         buttonCross,
       ],
     );
@@ -55,7 +61,7 @@ class BillRunnerGame extends FlameGame with HasCollisionDetection {
       hudComponents: <Component>[buttonCross],
     )
       ..viewfinder.anchor = Anchor.center
-      ..follow(player)
+      ..follow(_player)
       ..setBounds(
         Rectangle.fromPoints(
           halfCanvasSize,
@@ -65,5 +71,24 @@ class BillRunnerGame extends FlameGame with HasCollisionDetection {
       );
 
     debugMode = true;
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+    RawKeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    if (event is RawKeyDownEvent) {
+      _player.direction = switch (event.physicalKey) {
+        PhysicalKeyboardKey.arrowUp => PlayerDirection.top,
+        PhysicalKeyboardKey.arrowDown => PlayerDirection.bottom,
+        PhysicalKeyboardKey.arrowLeft => PlayerDirection.left,
+        PhysicalKeyboardKey.arrowRight => PlayerDirection.right,
+        _ => PlayerDirection.idle,
+      };
+      return KeyEventResult.handled;
+    }
+
+    return KeyEventResult.ignored;
   }
 }
