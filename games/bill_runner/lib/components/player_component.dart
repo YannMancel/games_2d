@@ -4,7 +4,6 @@ import 'package:bill_runner/components/_components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
-import 'package:flutter/foundation.dart';
 
 enum PlayerDirection { idle, top, bottom, left, right }
 
@@ -29,12 +28,13 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   final double _animationSpeed;
   final double _playerSpeed;
   late bool _hasCollided;
-  PlayerDirection? _collisionDirection;
+  late Map<PositionComponent, PlayerDirection?> _collisionDirectionMap;
 
   void _updatePosition(double dt) {
     final zero = Vector2.zero();
     final step = dt * _playerSpeed;
-    final cannotMove = _hasCollided && (current == _collisionDirection);
+    final cannotMove =
+        _hasCollided && _collisionDirectionMap.values.contains(current);
     final offset = cannotMove
         ? zero
         : switch (current) {
@@ -60,6 +60,7 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   FutureOr<void> onLoad() async {
     add(RectangleHitbox());
     _hasCollided = false;
+    _collisionDirectionMap = <PositionComponent, PlayerDirection>{};
 
     final image = game.images.fromCache('player_sprite_sheet.png');
     final sheet = SpriteSheet.fromColumnsAndRows(
@@ -122,12 +123,17 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   }
 
   @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+  void onCollision(
+    Set<Vector2> intersectionPoints,
+    PositionComponent other,
+  ) {
     super.onCollision(intersectionPoints, other);
-    if (other is CollisionRectangleComponent && !_hasCollided) {
-      if (kDebugMode) print('PLAYERS COLLISION START');
-      _hasCollided = true;
-      _collisionDirection = current;
+    if (other is CollisionRectangleComponent) {
+      if (!_hasCollided) _hasCollided = true;
+
+      if (!_collisionDirectionMap.keys.contains(other)) {
+        _collisionDirectionMap[other] = current;
+      }
     }
   }
 
@@ -135,8 +141,8 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
     if (other is CollisionRectangleComponent && _hasCollided) {
-      if (kDebugMode) print('PLAYERS COLLISION END');
-      _hasCollided = false;
+      _collisionDirectionMap.remove(other);
+      if (_collisionDirectionMap.isEmpty) _hasCollided = false;
     }
   }
 }
