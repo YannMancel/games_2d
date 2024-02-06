@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:bill_runner/components/_components.dart';
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 
 enum PlayerDirection { idle, top, bottom, left, right }
 
 class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
-    with HasGameReference<BillRunnerGame> {
+    with HasGameReference<BillRunnerGame>, CollisionCallbacks {
   PlayerComponent({
     super.key,
     super.position,
@@ -26,17 +27,24 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   final Vector2 _bounds;
   final double _animationSpeed;
   final double _playerSpeed;
+  late bool _hasCollided;
+  PlayerDirection? _collisionDirection;
 
   void _updatePosition(double dt) {
     final zero = Vector2.zero();
     final step = dt * _playerSpeed;
-    final offset = switch (current) {
-      PlayerDirection.idle || null => zero,
-      PlayerDirection.top => zero..y = -step,
-      PlayerDirection.bottom => zero..y = step,
-      PlayerDirection.left => zero..x = -step,
-      PlayerDirection.right => zero..x = step,
-    };
+    final cannotMove = _hasCollided && (current == _collisionDirection);
+    final offset = cannotMove
+        ? zero
+        : switch (current) {
+            PlayerDirection.idle || null => zero,
+            PlayerDirection.top => zero..y = -step,
+            PlayerDirection.bottom => zero..y = step,
+            PlayerDirection.left => zero..x = -step,
+            PlayerDirection.right => zero..x = step,
+          };
+
+    if (offset == Vector2.zero()) return;
 
     position = (position + offset)
       ..clamp(
@@ -49,6 +57,9 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
 
   @override
   FutureOr<void> onLoad() async {
+    add(RectangleHitbox());
+    _hasCollided = false;
+
     final image = game.images.fromCache('player_sprite_sheet.png');
     final sheet = SpriteSheet.fromColumnsAndRows(
       image: image,
@@ -107,5 +118,20 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   void update(double dt) {
     super.update(dt);
     _updatePosition(dt);
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    if (other is CollisionRectangleComponent && !_hasCollided) {
+      _hasCollided = true;
+      _collisionDirection = current;
+    }
+  }
+
+  @override
+  void onCollisionEnd(PositionComponent other) {
+    super.onCollisionEnd(other);
+    if (other is CollisionRectangleComponent) _hasCollided = false;
   }
 }

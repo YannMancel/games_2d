@@ -5,7 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 
-class BillRunnerGame extends FlameGame {
+class BillRunnerGame extends FlameGame with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     await images.loadAll(
@@ -34,9 +34,15 @@ class BillRunnerGame extends FlameGame {
       onPressedRight: () => player.direction = PlayerDirection.right,
     );
 
+    final collision = CollisionRectangleComponent(
+      position: halfCanvasSize + Vector2.all(100.0),
+      size: Vector2.all(30.0),
+    );
+
     world.addAll(
       <Component>[
         player,
+        collision,
         buttonCross,
       ],
     );
