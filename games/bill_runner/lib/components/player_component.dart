@@ -4,6 +4,7 @@ import 'package:bill_runner/components/_components.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/foundation.dart';
 
 enum PlayerDirection { idle, top, bottom, left, right }
 
@@ -124,6 +125,7 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (other is CollisionRectangleComponent && !_hasCollided) {
+      if (kDebugMode) print('PLAYERS COLLISION START');
       _hasCollided = true;
       _collisionDirection = current;
     }
@@ -132,6 +134,9 @@ class PlayerComponent extends SpriteAnimationGroupComponent<PlayerDirection>
   @override
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
-    if (other is CollisionRectangleComponent) _hasCollided = false;
+    if (other is CollisionRectangleComponent && _hasCollided) {
+      if (kDebugMode) print('PLAYERS COLLISION END');
+      _hasCollided = false;
+    }
   }
 }

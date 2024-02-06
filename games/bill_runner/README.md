@@ -15,11 +15,12 @@
 
 ## Dependencies
 * Flutter Version Management
-    * [fvm][dependency_fvm]
+  * [fvm][dependency_fvm]
 * Linter
-    * [flutter_lints][dependency_flutter_lints]
+  * [flutter_lints][dependency_flutter_lints]
 * Game
-    * [flame][dependency_flame]
+  * [flame][dependency_flame]
+  * [flame tiled][dependency_flame_tiled]
 
 ## Troubleshooting
 
@@ -39,6 +40,7 @@
 [dependency_fvm]: https://fvm.app/
 [dependency_flutter_lints]: https://pub.dev/packages/flutter_lints
 [dependency_flame]: https://pub.dev/packages/flame
+[dependency_flame_tiled]: https://pub.dev/packages/flame_tiled
 [useful_android_studio]: https://developer.android.com/studio
 [useful_virtual_device]: https://developer.android.com/studio/run/managing-avds.html
 [useful_developer_options]: https://developer.android.com/studio/debug/dev-options.html#enable

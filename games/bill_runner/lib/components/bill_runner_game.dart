@@ -4,26 +4,35 @@ import 'package:bill_runner/components/_components.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
+import 'package:flame_tiled/flame_tiled.dart';
 
 class BillRunnerGame extends FlameGame with HasCollisionDetection {
   @override
   Future<void> onLoad() async {
     await images.loadAll(
       <String>[
-        'background.png',
         'player_sprite_sheet.png',
         'joystick_sprite_sheet.png',
       ],
     );
 
-    final background = BackgroundComponent();
-    // We need background.size to set bounds
-    await world.add(background);
+    final map = await TiledComponent.load('map.tmx', Vector2.all(32.0));
+    // We need map.size to set bounds
+    await world.add(map);
+
+    final collisionLayer = map.tileMap.getLayer<ObjectGroup>('collision_layer');
+    for (final object in collisionLayer!.objects) {
+      final collision = CollisionRectangleComponent(
+        position: Vector2(object.x, object.y),
+        size: Vector2(object.width, object.height),
+      );
+      world.add(collision);
+    }
 
     final halfCanvasSize = canvasSize / 2.0;
     final player = PlayerComponent(
       position: halfCanvasSize,
-      bounds: background.size,
+      bounds: map.size,
     );
     final buttonCross = ButtonCrossComponent(
       position: canvasSize,
@@ -34,15 +43,9 @@ class BillRunnerGame extends FlameGame with HasCollisionDetection {
       onPressedRight: () => player.direction = PlayerDirection.right,
     );
 
-    final collision = CollisionRectangleComponent(
-      position: halfCanvasSize + Vector2.all(100.0),
-      size: Vector2.all(30.0),
-    );
-
     world.addAll(
       <Component>[
         player,
-        collision,
         buttonCross,
       ],
     );
@@ -56,7 +59,7 @@ class BillRunnerGame extends FlameGame with HasCollisionDetection {
       ..setBounds(
         Rectangle.fromPoints(
           halfCanvasSize,
-          background.size - halfCanvasSize,
+          map.size - halfCanvasSize,
         ),
         considerViewport: true,
       );
