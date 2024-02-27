@@ -29,13 +29,18 @@ install: ## Install environment
 ## -------------------------------------------------------------------------------------------------
 ##
 
+.PHONY: enable-web
+enable-web: ## Enable web platform
+	@$(call print_color_message,"Enable web platform")
+	$(FLUTTER) config --enable-web
+
 .PHONY: generate
 generate: ## Generate a project
 	# make generate PROJECT=bill_runner DESCRIPTION="A Flutter game with Flame."
 	@$(call print_color_message,"Generate a project")
 	$(FLUTTER) create ./$(FOLDER)/$(PROJECT)/ \
 		--description="$(DESCRIPTION)" \
-      	--platforms=android \
+      	--platforms=android,web \
       	--org="com.mancel.yann" \
 	  	--project-name=$(PROJECT)
 

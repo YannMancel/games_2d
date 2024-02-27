@@ -10,7 +10,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Make git clone
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Setup fvm
               uses: kuhnroyal/flutter-fvm-config-action@v1
@@ -18,7 +18,7 @@ jobs:
                   path: '.fvm/fvm_config.json'
 
             - name: Clone flutter version
-              uses: subosito/flutter-action@v1
+              uses: subosito/flutter-action@v2
               with:
                   flutter-version: ${{ env.FLUTTER_VERSION }}
                   channel: ${{ env.FLUTTER_CHANNEL }}
@@ -32,10 +32,10 @@ jobs:
             - name: Run all static analysis checks of inner projects (Melos)
               run: dart run melos run lint:all
 
-#            - name: run tests
-#              run: flutter test --concurrency=1 --coverage --test-randomize-ordering-seed random
-#
-#            - name: Upload coverage reports to Codecov
-#              uses: codecov/codecov-action@v3
-#              env:
-#                  CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+            - name: Build and deploy bill_runner project (GitHub Pages)
+              uses: bluefireteam/flutter-gh-pages@v8
+              with:
+                  workingDir: ./games/bill_runner
+                  baseHref: /games_2d/
+                  webRenderer: canvaskit
+                  targetBranch: bill-runner-page

@@ -103,3 +103,15 @@ scripts:
       Run `flutter run` in debug mode.
     packageFilters:
       flutter: true
+
+  run_web_game:
+    run: |
+      dart run melos exec -- \
+        flutter run \
+          -d chrome \
+          --release \
+          --web-renderer=canvaskit
+    description: |
+      Run `flutter run` in debug mode.
+    packageFilters:
+      flutter: true

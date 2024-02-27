@@ -5,6 +5,9 @@
 # games_2d
 **Goal**: A project which manage several Flutter projects for games 2D.
 
+## GitHub Pages
+* [Last game][github_pages]
+
 ## Setup the project in Android studio
 1. Download the project code, preferably using `git clone git@github.com:YannMancel/games_2d.git`.
 2. In Android Studio, select *File* | *Open...*
@@ -16,6 +19,7 @@
 [badge_flutter]: https://img.shields.io/badge/flutter-v3.16.3-blue?logo=flutter
 [badge_github_action]: https://github.com/YannMancel/games_2d/actions/workflows/games_2d_CI.yaml/badge.svg
 [badge_melos]: https://img.shields.io/badge/maintained%20with-melos-f700ff.svg
+[github_pages]: https://yannmancel.github.io/games_2d/
 [link_flutter_release]: https://docs.flutter.dev/development/tools/sdk/releases
 [link_melos]: https://github.com/invertase/melos
 [folder_bill_runner]: games/bill_runner/README.md

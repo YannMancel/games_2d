@@ -6,6 +6,7 @@ import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame_tiled/flame_tiled.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -70,7 +71,7 @@ class BillRunnerGame extends FlameGame
         considerViewport: true,
       );
 
-    debugMode = true;
+    debugMode = kDebugMode;
   }
 
   @override
